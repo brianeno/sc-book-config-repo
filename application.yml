@@ -1,44 +1,34 @@
-# Global application defaults for production environment
+# Global application defaults for development environment
 # These settings apply to all services unless overridden
 
 spring:
   profiles:
-    active: prod
+    active: dev
   
-# Production environment settings
+# Development environment settings
 logging:
   level:
-    com.chargeroute: INFO
-    org.springframework.cloud: WARN
-    org.springframework.web: WARN
-    root: WARN
+    com.chargeroute: DEBUG
+    org.springframework.cloud: DEBUG
+    org.springframework.web: DEBUG
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-  file:
-    name: logs/chargeroute.log
-    max-size: 100MB
-    max-history: 30
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 
-# Production specific settings - restricted endpoints
+# Development specific settings
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: "*"
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: always
     shutdown:
-      enabled: false
-  metrics:
-    export:
-      prometheus:
-        enabled: true
+      enabled: true
 
-# Production tracing - disabled for performance
+# Development tracing
 spring.sleuth:
   zipkin:
     enabled: false
   sampler:
-    probability: 0.1  # Sample only 10% of requests
+    probability: 1.0

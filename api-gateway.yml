@@ -1,4 +1,4 @@
-# API Gateway Configuration for Production Environment
+# API Gateway Configuration for Development Environment
 
 server:
   port: 8080
@@ -8,13 +8,13 @@ spring:
     gateway:
       server:
         webflux:
-          # Global CORS configuration for production
+          # Global CORS configuration for development
           globalcors:
             cors-configurations:
               '[/**]':
                 allowedOrigins:
-                  - "https://app.chargeroute.com"     # Production web app
-                  - "https://admin.chargeroute.com"   # Production admin dashboard
+                  - "http://localhost:3000"  # React web app
+                  - "http://localhost:3001"  # Admin dashboard
                 allowedMethods:
                   - GET
                   - POST
@@ -25,12 +25,12 @@ spring:
                 allowCredentials: true
                 maxAge: 3600
 
-          # Default filters for production
+          # Default filters for development
           default-filters:
             - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
-            - AddRequestHeader=X-Gateway-Name, ChargeRoute-API-Gateway
+            - AddRequestHeader=X-Gateway-Name, ChargeRoute-API-Gateway-Dev
             - AddRequestHeader=X-Request-Timestamp, #{T(java.time.Instant).now().toString()}
-            - AddRequestHeader=X-Environment, production
+            - AddRequestHeader=X-Environment, development
 
           # Enable automatic route discovery from Eureka
           discovery:
@@ -38,7 +38,7 @@ spring:
               enabled: true
               lower-case-service-id: true
 
-          # Custom route definitions with production resilience
+          # Custom route definitions
           routes:
             # User Management Service Routes
             - id: user-service-route
@@ -50,18 +50,6 @@ spring:
                   args:
                     name: user-service-cb
                     fallbackUri: forward:/fallback/users
-                - name: Retry
-                  args:
-                    retries: 3
-                    statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
-                    backoff:
-                      firstBackoff: 50ms
-                      maxBackoff: 500ms
-                - name: RequestRateLimiter
-                  args:
-                    redis-rate-limiter.replenishRate: 10
-                    redis-rate-limiter.burstCapacity: 20
-                    key-resolver: "#{@userKeyResolver}"
                 - AddRequestHeader=X-Service-Route, user-management
 
             # Charge Unit Management Service Routes  
@@ -74,10 +62,6 @@ spring:
                   args:
                     name: charge-unit-service-cb
                     fallbackUri: forward:/fallback/charge-units
-                - name: Retry
-                  args:
-                    retries: 3
-                    statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
                 - AddRequestHeader=X-Service-Route, charge-unit-management
 
             # Session Management Service Routes
@@ -90,10 +74,6 @@ spring:
                   args:
                     name: session-service-cb
                     fallbackUri: forward:/fallback/sessions
-                - name: Retry
-                  args:
-                    retries: 3
-                    statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
                 - AddRequestHeader=X-Service-Route, session-management
 
             # Notification Management Service Routes
@@ -108,41 +88,10 @@ spring:
                     fallbackUri: forward:/fallback/notifications
                 - AddRequestHeader=X-Service-Route, notification-management
 
-            # Gateway actuator endpoints
-            - id: gateway-actuator-route
-              uri: http://localhost:8080
-              predicates:
-                - Path=/actuator/**
-              filters:
-                - AddRequestHeader=X-Internal-Request, gateway-actuator
-
-          # Production HTTP client settings
+          # Development HTTP client settings - shorter timeouts
           httpclient:
-            connect-timeout: 5000
-            response-timeout: 10s
-
-    # Production circuit breaker settings
-    circuitbreaker:
-      resilience4j:
-        configs:
-          default:
-            failure-rate-threshold: 50
-            wait-duration-in-open-state: 30s
-            sliding-window-size: 10
-            minimum-number-of-calls: 5
-
-# Redis configuration for rate limiting (production)
-spring:
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      timeout: 10s
-      lettuce:
-        pool:
-          max-active: 8
-          max-idle: 8
-          min-idle: 0
+            connect-timeout: 2000
+            response-timeout: 5s
 
 # Eureka Client Configuration
 eureka:
@@ -151,22 +100,21 @@ eureka:
       defaultZone: http://${eureka.username:chargeroute}:${eureka.password:Admin123!}@${eureka.hostname:localhost}:${eureka.port:8761}/eureka/
     fetch-registry: true
     register-with-eureka: true
-    registry-fetch-interval-seconds: 30
+    registry-fetch-interval-seconds: 10  # More frequent for dev
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-    # Production - standard heartbeat
-    lease-renewal-interval-in-seconds: 30
-    lease-expiration-duration-in-seconds: 90
+    # Development - faster heartbeat
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
     metadata-map:
-      zone: production
-      version: 1.0.0
+      zone: development
+      version: 1.0.0-dev
       type: api-gateway
 
-# Production logging - restricted
+# Development logging
 logging:
   level:
-    org.springframework.cloud.gateway: INFO
-    com.chargeroute.gateway: INFO
-    reactor.netty.http.client: WARN
-    root: WARN
+    org.springframework.cloud.gateway: DEBUG
+    com.chargeroute.gateway: DEBUG
+    reactor.netty.http.client: DEBUG

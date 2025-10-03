@@ -1,72 +1,55 @@
-# Notification Management Service Configuration for Production Environment
+# Notification Management Service Configuration for Development Environment
 
 server:
   port: 0  # Dynamic port assignment
 
-# EV Charging Business Configuration - Production Values
+# EV Charging Business Configuration - Development Values
 chargeroute:
   notification:
-    # Production - enterprise-grade notifications
+    # Development - frequent and detailed notifications
     email:
       enabled: true
-      smtp-host: ${SMTP_HOST:smtp.chargeroute.com}
-      smtp-port: ${SMTP_PORT:587}
-      username: ${SMTP_USERNAME:notifications@chargeroute.com}
-      password: ${SMTP_PASSWORD:changeme}
-      from-address: "noreply@chargeroute.com"
-      from-name: "ChargeRoute"
-      use-tls: true
-      connection-timeout-ms: 5000
+      smtp-host: localhost
+      smtp-port: 1025  # MailHog for dev testing
+      username: ""
+      password: ""
+      from-address: "dev-noreply@chargeroute.com"
+      from-name: "ChargeRoute Development"
     sms:
-      enabled: true
-      provider: ${SMS_PROVIDER:twilio}
-      api-key: ${SMS_API_KEY:changeme}
-      api-secret: ${SMS_API_SECRET:changeme}
-      from-number: ${SMS_FROM_NUMBER:+1234567890}
-      rate-limit-per-minute: 100
+      enabled: false  # Disabled in dev to avoid costs
+      provider: "mock"
+      api-key: "dev-key"
     push:
       enabled: true
-      provider: ${PUSH_PROVIDER:fcm}
-      api-key: ${PUSH_API_KEY:changeme}
-      rate-limit-per-minute: 1000
+      provider: "mock"
+      api-key: "dev-key"
     templates:
-      # Production templates - professional tone
-      session-started: "Charging session started at {stationName}. Track your progress in the ChargeRoute app."
-      session-completed: "Charging complete! Energy: {energyConsumed}kWh, Cost: ${cost}. Receipt available in app."
-      session-error: "Charging session interrupted at {stationName}. Please try another station or contact support."
-      payment-processed: "Payment of ${amount} processed for charging session. Thank you for using ChargeRoute!"
-      membership-upgraded: "Welcome to {membershipType}! Enjoy your enhanced benefits and savings."
-      account-locked: "Account temporarily locked for security. Contact support to unlock."
-      station-maintenance: "Station {stationName} is temporarily unavailable for maintenance. Expected return: {returnTime}"
+      # Development templates with debug info
+      session-started: "Dev: Charging session started at {stationName}. Session ID: {sessionId}"
+      session-completed: "Dev: Charging complete! Energy: {energyConsumed}kWh, Cost: ${cost}"
+      session-error: "Dev: Session error at {stationName}. Error: {errorMessage}"
+      payment-processed: "Dev: Payment of ${amount} processed for session {sessionId}"
+      membership-upgraded: "Dev: Membership upgraded to {membershipType}"
+      account-locked: "Dev: Account locked after {attempts} failed login attempts"
     preferences:
-      # Production - respect user preferences
+      # Development - allow all notification types
       allow-email: true
-      allow-sms: true
+      allow-sms: false
       allow-push: true
-      quiet-hours-enabled: true
-      quiet-hours-start: "22:00"
-      quiet-hours-end: "07:00"
-      timezone-aware: true
+      quiet-hours-enabled: false  # No quiet hours in dev
     delivery:
-      # Production - optimized batch processing
-      batch-size: 100
-      retry-attempts: 5
-      retry-delay-seconds: 30
+      # Development - immediate delivery
+      batch-size: 5
+      retry-attempts: 2
+      retry-delay-seconds: 5
       enable-dead-letter-queue: true
-      dead-letter-retention-days: 7
-      enable-delivery-tracking: true
-    analytics:
-      enable-open-tracking: true
-      enable-click-tracking: true
-      retention-days: 90
 
 # Service-to-Service Communication
 integration:
   services:
     user-management:
       base-url: http://user-management-service
-      timeout-ms: 3000
-      retry-attempts: 3
+      timeout-ms: 1500
 
 # Eureka Client Configuration
 eureka:
@@ -75,20 +58,17 @@ eureka:
       defaultZone: http://${eureka.username:chargeroute}:${eureka.password:Admin123!}@${eureka.hostname:localhost}:${eureka.port:8761}/eureka/
     fetch-registry: true
     register-with-eureka: true
-    registry-fetch-interval-seconds: 30
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-    # Production - standard heartbeat
-    lease-renewal-interval-in-seconds: 30
-    lease-expiration-duration-in-seconds: 90
+    # Development - faster heartbeat
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
 
-# Data persistence and message queue will be added in the persistence chapter
+# Data persistence will be added in the persistence chapter
 
-# Production logging - restricted
+# Development logging
 logging:
   level:
-    com.chargeroute.notification: INFO
-    org.springframework.web: WARN
-    org.hibernate.SQL: WARN
-    root: WARN
+    com.chargeroute.notification: DEBUG
+    org.springframework.web: DEBUG

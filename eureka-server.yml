@@ -1,4 +1,4 @@
-# Eureka Server Configuration for Production Environment
+# Eureka Server Configuration for Development Environment
 
 server:
   port: 8761
@@ -9,7 +9,7 @@ spring:
   security:
     user:
       name: chargeroute
-      password: ${EUREKA_PASSWORD:Admin123!}
+      password: Admin123!
 
 eureka:
   instance:
@@ -21,34 +21,22 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka/
   server:
-    # Production settings - more robust
-    enable-self-preservation: true
-    eviction-interval-timer-in-ms: 60000
-    renewal-threshold-update-interval-ms: 30000
+    # Development settings - more lenient
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 15000
+    renewal-threshold-update-interval-ms: 15000
     expected-client-renewal-interval-seconds: 30
-    renewal-percent-threshold: 0.85
-    
-    # Production resilience
-    max-idle-time-in-minutes: 5
-    response-cache-auto-expiration-in-seconds: 180
-    response-cache-update-interval-ms: 30000
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info,metrics,env
   endpoint:
     health:
-      show-details: when-authorized
-  metrics:
-    export:
-      prometheus:
-        enabled: true
+      show-details: always
 
-# Production logging - less verbose
 logging:
   level:
-    com.netflix.eureka: INFO
-    com.netflix.discovery: INFO
-    root: WARN
+    com.netflix.eureka: DEBUG
+    com.netflix.discovery: DEBUG

@@ -1,37 +1,30 @@
-# User Management Service Configuration for Production Environment
+# User Management Service Configuration for Development Environment
 
 server:
   port: 0  # Dynamic port assignment
 
-# EV Charging Business Configuration - Production Values
+# EV Charging Business Configuration - Development Values
 chargeroute:
   user:
-    # Production - longer timeouts for stability
-    session-timeout-minutes: 60
-    max-login-attempts: 8
-    account-lockout-minutes: 30
+    # Development - shorter timeouts for testing
+    session-timeout-minutes: 15
+    max-login-attempts: 3
+    account-lockout-minutes: 5
     membership:
       allow-basic-upgrade: true
       allow-premium-downgrade: true
       premium-benefit-multiplier: 2
-      # Production pricing
-      basic-monthly-cost: 12.99
-      premium-monthly-cost: 39.99
+      # Development pricing - lower costs
+      basic-monthly-cost: 5.99
+      premium-monthly-cost: 19.99
     notification:
       send-welcome-email: true
       send-account-updates: true
       send-security-alerts: true
       send-membership-changes: true
     validation:
-      email-verification-required: true   # Required in production
-      phone-verification-required: true   # Required in production
-    security:
-      password-min-length: 12
-      password-require-special-chars: true
-      password-require-numbers: true
-      password-require-uppercase: true
-      session-concurrent-limit: 3
-      enable-two-factor-auth: true
+      email-verification-required: false  # Skip for dev
+      phone-verification-required: false  # Skip for dev
 
 # Eureka Client Configuration
 eureka:
@@ -40,20 +33,17 @@ eureka:
       defaultZone: http://${eureka.username:chargeroute}:${eureka.password:Admin123!}@${eureka.hostname:localhost}:${eureka.port:8761}/eureka/
     fetch-registry: true
     register-with-eureka: true
-    registry-fetch-interval-seconds: 30
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-    # Production - standard heartbeat
-    lease-renewal-interval-in-seconds: 30
-    lease-expiration-duration-in-seconds: 90
+    # Development - faster heartbeat
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
 
 # Data persistence will be added in the persistence chapter
 
-# Production logging - restricted
+# Development logging
 logging:
   level:
-    com.chargeroute.user: INFO
-    org.springframework.web: WARN
-    org.hibernate.SQL: WARN
-    root: WARN
+    com.chargeroute.user: DEBUG
+    org.springframework.web: DEBUG
