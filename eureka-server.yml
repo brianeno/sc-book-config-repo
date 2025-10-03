@@ -5,7 +5,7 @@ server:
 
 spring:
   application:
-    name: eureka-discovery-service
+    name: eureka-server
   security:
     user:
       name: chargeroute
