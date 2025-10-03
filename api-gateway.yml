@@ -27,10 +27,21 @@ spring:
 
           # Default filters for production
           default-filters:
-            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
-            - AddRequestHeader=X-Gateway-Name, ChargeRoute-API-Gateway
-            - AddRequestHeader=X-Request-Timestamp, #{T(java.time.Instant).now().toString()}
-            - AddRequestHeader=X-Environment, production
+            - name: DedupeResponseHeader
+              args:
+                name: Access-Control-Allow-Origin Access-Control-Allow-Credentials
+            - name: AddRequestHeader
+              args:
+                name: X-Gateway-Name
+                value: ChargeRoute-API-Gateway
+            - name: AddRequestHeader
+              args:
+                name: X-Request-Timestamp
+                value: "#{T(java.time.Instant).now().toString()}"
+            - name: AddRequestHeader
+              args:
+                name: X-Environment
+                value: production
 
           # Enable automatic route discovery from Eureka
           discovery:
@@ -57,7 +68,10 @@ spring:
                     backoff:
                       firstBackoff: 50ms
                       maxBackoff: 500ms
-                - AddRequestHeader=X-Service-Route, user-management
+                - name: AddRequestHeader
+                  args:
+                    name: X-Service-Route
+                    value: user-management
 
             # Charge Unit Management Service Routes  
             - id: charge-unit-service-route
@@ -73,7 +87,10 @@ spring:
                   args:
                     retries: 3
                     statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
-                - AddRequestHeader=X-Service-Route, charge-unit-management
+                - name: AddRequestHeader
+                  args:
+                    name: X-Service-Route
+                    value: charge-unit-management
 
             # Session Management Service Routes
             - id: session-service-route
@@ -89,7 +106,10 @@ spring:
                   args:
                     retries: 3
                     statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
-                - AddRequestHeader=X-Service-Route, session-management
+                - name: AddRequestHeader
+                  args:
+                    name: X-Service-Route
+                    value: session-management
 
             # Notification Management Service Routes
             - id: notification-service-route
@@ -101,7 +121,10 @@ spring:
                   args:
                     name: notification-service-cb
                     fallbackUri: forward:/fallback/notifications
-                - AddRequestHeader=X-Service-Route, notification-management
+                - name: AddRequestHeader
+                  args:
+                    name: X-Service-Route
+                    value: notification-management
 
             # Gateway actuator endpoints
             - id: gateway-actuator-route
@@ -109,7 +132,10 @@ spring:
               predicates:
                 - Path=/actuator/**
               filters:
-                - AddRequestHeader=X-Internal-Request, gateway-actuator
+                - name: AddRequestHeader
+                  args:
+                    name: X-Internal-Request
+                    value: gateway-actuator
 
           # Production HTTP client settings
           httpclient:
