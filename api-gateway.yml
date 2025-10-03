@@ -135,6 +135,19 @@ eureka:
       version: 1.0.0-dev
       type: api-gateway
 
+# Health check configuration - disable Redis for development
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh
+  endpoint:
+    health:
+      show-details: always
+  health:
+    redis:
+      enabled: false
+
 # Development logging
 logging:
   level:
