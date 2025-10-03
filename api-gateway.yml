@@ -37,7 +37,7 @@ spring:
             - name: AddRequestHeader
               args:
                 name: X-Request-Timestamp
-                value: "#{T(java.time.Instant).now().toString()}"
+                value: "#{new java.util.Date().toString()}"
             - name: AddRequestHeader
               args:
                 name: X-Environment
