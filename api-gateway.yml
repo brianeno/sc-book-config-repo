@@ -57,11 +57,6 @@ spring:
                     backoff:
                       firstBackoff: 50ms
                       maxBackoff: 500ms
-                - name: RequestRateLimiter
-                  args:
-                    redis-rate-limiter.replenishRate: 10
-                    redis-rate-limiter.burstCapacity: 20
-                    key-resolver: "#{@userKeyResolver}"
                 - AddRequestHeader=X-Service-Route, user-management
 
             # Charge Unit Management Service Routes  
@@ -131,17 +126,6 @@ spring:
             sliding-window-size: 10
             minimum-number-of-calls: 5
   
-  # Redis configuration for rate limiting (production)
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      timeout: 10s
-      lettuce:
-        pool:
-          max-active: 8
-          max-idle: 8
-          min-idle: 0
 
 # Eureka Client Configuration
 eureka:
