@@ -1,5 +1,6 @@
 # Global application defaults for production environment
 # These settings apply to all services unless overridden
+# Note: spring.profiles.active cannot be set here - it's determined by the service startup
 
 # Production environment settings
 logging:
