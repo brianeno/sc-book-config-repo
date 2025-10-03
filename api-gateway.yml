@@ -130,9 +130,8 @@ spring:
             wait-duration-in-open-state: 30s
             sliding-window-size: 10
             minimum-number-of-calls: 5
-
-# Redis configuration for rate limiting (production)
-spring:
+  
+  # Redis configuration for rate limiting (production)
   data:
     redis:
       host: ${REDIS_HOST:localhost}
