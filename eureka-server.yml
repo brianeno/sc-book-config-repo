@@ -5,7 +5,7 @@ server:
 
 spring:
   application:
-    name: eureka-discovery-service
+    name: eureka-server
   security:
     user:
       name: chargeroute
@@ -27,7 +27,7 @@ eureka:
     renewal-threshold-update-interval-ms: 30000
     expected-client-renewal-interval-seconds: 30
     renewal-percent-threshold: 0.85
-    
+
     # Production resilience
     max-idle-time-in-minutes: 5
     response-cache-auto-expiration-in-seconds: 180
