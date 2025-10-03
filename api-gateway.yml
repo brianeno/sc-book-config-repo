@@ -36,8 +36,8 @@ spring:
                 value: ChargeRoute-API-Gateway-Dev
             - name: AddRequestHeader
               args:
-                name: X-Request-Timestamp
-                value: "#{new java.util.Date().toString()}"
+                name: X-Request-ID
+                value: "${random.uuid}"
             - name: AddRequestHeader
               args:
                 name: X-Environment
