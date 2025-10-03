@@ -21,16 +21,27 @@ spring:
                   - PUT
                   - DELETE
                   - OPTIONS
-                allowedHeaders: "*"
+                allowedHeaders: '*'
                 allowCredentials: true
                 maxAge: 3600
 
           # Default filters for development
           default-filters:
-            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
-            - AddRequestHeader=X-Gateway-Name, ChargeRoute-API-Gateway-Dev
-            - AddRequestHeader=X-Request-Timestamp, #{T(java.time.Instant).now().toString()}
-            - AddRequestHeader=X-Environment, development
+            - name: DedupeResponseHeader
+              args:
+                name: Access-Control-Allow-Origin Access-Control-Allow-Credentials
+            - name: AddRequestHeader
+              args:
+                name: X-Gateway-Name
+                value: ChargeRoute-API-Gateway-Dev
+            - name: AddRequestHeader
+              args:
+                name: X-Request-Timestamp
+                value: "#{T(java.time.Instant).now().toString()}"
+            - name: AddRequestHeader
+              args:
+                name: X-Environment
+                value: development
 
           # Enable automatic route discovery from Eureka
           discovery:
@@ -50,9 +61,12 @@ spring:
                   args:
                     name: user-service-cb
                     fallbackUri: forward:/fallback/users
-                - AddRequestHeader=X-Service-Route, user-management
+                - name: AddRequestHeader
+                  args:
+                    name: X-Service-Route
+                    value: user-management
 
-            # Charge Unit Management Service Routes  
+            # Charge Unit Management Service Routes
             - id: charge-unit-service-route
               uri: lb://charge-unit-management-service
               predicates:
@@ -62,7 +76,10 @@ spring:
                   args:
                     name: charge-unit-service-cb
                     fallbackUri: forward:/fallback/charge-units
-                - AddRequestHeader=X-Service-Route, charge-unit-management
+                - name: AddRequestHeader
+                  args:
+                    name: X-Service-Route
+                    value: charge-unit-management
 
             # Session Management Service Routes
             - id: session-service-route
@@ -74,7 +91,10 @@ spring:
                   args:
                     name: session-service-cb
                     fallbackUri: forward:/fallback/sessions
-                - AddRequestHeader=X-Service-Route, session-management
+                - name: AddRequestHeader
+                  args:
+                    name: X-Service-Route
+                    value: session-management
 
             # Notification Management Service Routes
             - id: notification-service-route
@@ -86,7 +106,10 @@ spring:
                   args:
                     name: notification-service-cb
                     fallbackUri: forward:/fallback/notifications
-                - AddRequestHeader=X-Service-Route, notification-management
+                - name: AddRequestHeader
+                  args:
+                    name: X-Service-Route
+                    value: notification-management
 
           # Development HTTP client settings - shorter timeouts
           httpclient:
